@@ -3090,6 +3090,22 @@ Dashboard Page Styles */
             font-weight: 500;
             margin-left: 8px;
         }
+        .html_saveCta{
+            background-color:transparent;
+            color: #25397F;
+            border: 2px solid #25397F!important;
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+        .html_reviewCta{
+            background-color: #25397F;
+            color: #fff;
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
         .uploadCTA{
              background-color: #25397F;
             color: #fff;
