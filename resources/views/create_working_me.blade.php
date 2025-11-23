@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Create New Task</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+     <link rel="stylesheet" type="text/css" href="https://d1jougtdqdwy1v.cloudfront.net/css/5.2.3/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://d1jougtdqdwy1v.cloudfront.net/js/5.2.3/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    @include('header')
+    <section class="dashboard-content">
+        @include('sidebar')
+            <div class="main-dashboard-container">
+                <div class="hero-section-dashboard">
+                     <section class="createCtaContainer">
+                        <form id="ticketForm" method="POST" action="{{ route('task.store') }}">
+                            @csrf
+                            <input type="hidden" name="task_id" id="task_id">
+                            <!-- backup of raw svg (kept for safety/traceability) -->
+                            <input type="hidden" id="svg_backup" name="svg_backup" value="">
+                            <h3>Create CTA</h3>
+                                <div class="accordion" id="accordionExample">
+                                    
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                             <span class="edit-container">
+                                                <span>Task Information</span>
+                                                <span class="editCtaContainer" style="display: none;"><a href="#" class="editCta"><img src="images/pencil-square.png" alt=""> &nbsp; Edit</a></span>
+                                            </span>
+                                        </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                            <div class="accordion-body">
+                                                
+                                                
+                                                <div class="createTaskInfo">
+                                                    <div class="form-group-control">
+                                                        <label for="ticket_link">Ticket Link</label>
+                                                        <input type="url" class="form-control taskField" name="ticket_link" id="ticket_link" placeholder="Enter Ticket Link" pattern="https?://.+" title="Enter a valid URL (must start with http:// or https://)"  value="{{ old('ticket_link', $ticket->ticket_link ?? '') }}"  required class="editField form-control">
+                                                    </div>
+                                                    <div class="form-group-control">
+                                                      <label for="task_desc">Task Description</label>
+                                                      <textarea 
+                                                          class="form-control taskField editField" 
+                                                          id="task_desc" 
+                                                          name="ticket_description" 
+                                                          rows="4" 
+                                                          placeholder="Enter Description" 
+                                                          required
+                                                      >{{ old('ticket_description', $ticket->ticket_description ?? '') }}</textarea>
+                                                  </div>
+
+                                                    <div class="row">
+                                                        <div class="col-lg-4">
+                                                        <div class="form-group-control">
+                                                                <label for="DealerCode">Dealer Code</label>
+                                                                <input type="text" class="form-control editField taskField" id="DealerCode" name="dealer_code" placeholder="Enter Dealer Code" value="{{ old('dealer_code', $ticket->dealer_code ?? '') }}" required>
+                                                            </div>  
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group-control">
+                                                                <label for="website">Dealer Website Link</label>
+                                                                <input type="url" class="form-control editField taskField" id="website" name="website_link" placeholder="Auto-fetched Website Link" value="{{ old('website_link', $ticket->website_link ?? '') }}" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <div class="form-group-control">
+                                                                <div class="form-group-control">
+                                                                    <label for="project">Project</label>
+                                                                    @php
+                                                                        $connection = session('db_connection');
+                                                                        $eshopName = $connection === 'mysql2' ? 'E-Shop US' : 'E-Shop Canada';
+                                                                    @endphp
+
+                                                                    <!-- <select class="form-select editField taskField" id="project" name="project_name" required editField>
+                                                                        <option value="E-Shop US" {{ $eshopName === 'E-Shop US' ? 'selected' : '' }}>E-Shop US</option>
+                                                                        <option value="E-Shop Canada" {{ $eshopName === 'E-Shop Canada' ? 'selected' : '' }}>E-Shop Canada</option>
+                                                                    </select> -->
+                                                                    <select class="form-select editField taskField" id="project" name="project_name" required>
+                                                                      <option value="E-Shop US"
+                                                                          {{ old('project_name', $ticket->project_name ?? $eshopName) == 'E-Shop US' ? 'selected' : '' }}>
+                                                                          E-Shop US
+                                                                      </option>
+
+                                                                      <option value="E-Shop Canada"
+                                                                          {{ old('project_name', $ticket->project_name ?? $eshopName) == 'E-Shop Canada' ? 'selected' : '' }}>
+                                                                          E-Shop Canada
+                                                                      </option>
+                                                                  </select>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            <div class="footer-btns">
+                                 <a href="{{ route('dashboard') }}" class=" cancel-cta btn btn-outline-secondary">Cancel</a>
+                                <button type="submit" class="save-cta btn btn-primary" id="saveTask">Save Task</button>
+                            </div>
+                        </form>
+                        </section>
+
+                        <!-- TAB CONTAINER -->
+                        <section class="customizeContainer createCtaContainer" style="display: none;">
+                            <ul class="nav nav-tabs options-tab" id="myTabAuto" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link standard active" id="new-tab-svg" data-bs-toggle="tab" data-bs-target="#new-tab-svg-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">SVG Button</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link custom" id="new-tab-png" data-bs-toggle="tab" data-bs-target="#new-tab-png-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">PNG Button</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link custom" id="new-tab-html" data-bs-toggle="tab" data-bs-target="#new-tab-html-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">HTML Code</button>
+                                </li>
+                            </ul>
+
+                             <!-- TAB CONTENT START -->
+                          <div class="row">
+                                <div class="tab-content acc-tab-content" id="myTabAutoContent">
+                                    <div class="tab-pane fade show active" id="new-tab-svg-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                                        
+                                        <!-- CUSTOM UI -->
+                                          <div class="row">
+                                               <div class="col-lg-6">
+                                                <div class="tab-contents-cta">
+                                                    <h5>Upload a SVG</h5>
+                                                    <div class="file-upload-wrapper">
+                                                        <label for="svgUpload" class="file-upload-box">
+                                                            <div class="upload-icon">
+                                                            <img src="images/upload-cloud.png" alt="Upload">
+                                                            </div>
+                                                            <div class="upload-text">
+                                                            <p>Choose a SVG File</p>
+                                                            </div>
+                                                            <input type="file" id="svgUpload" class="file-input" accept=".jpg,.png,.svg,.webp">
+                                                        </label>
+
+                                                        <div id="uploadedFile" class="uploaded-file"></div>
+                                                    </div>
+                                                      
+                                                    <!-- Reference CTA Preview -->
+                                                    
+                                                    <div class="editedSection">
+                                                        <button class="mode-btn active" onclick="setMode('edit', this)"><i class="bi bi-pencil-fill"></i> Edit Mode</button>
+                                                        <button class="mode-btn erase-mode" onclick="setMode('erase', this)"><i class="bi bi-eraser-fill"></i> Erase Mode</button>
+                                                        <label for="textMode">Text Mode</label>
+                                                        <select id="textMode">
+                                                            <option value="single">Single Line</option>
+                                                            <option value="multi">Multiline</option>
+                                                        </select>
+                                                        <label for="textContent" class="d-block">Button Text</label>
+                                                        <input type="text" id="textContent" class="form-control editField" value="">
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <label style="font-size: 12px;">X Position (%)</label>
+                                                                    <input class="form-control editField" type="number" id="textX" value="50" min="0" max="100">
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label style="font-size: 12px;">Y Position (%)</label>
+                                                                    <input class="form-control editField" type="number" id="textY" value="50" min="0" max="100">
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="textSize">Text Size</label>
+                                                                    <input class="form-control editField" type="number" id="textSize" value="24" min="12" max="72"/>   
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="fontFamily">Font Family</label>
+                                                                     <select class="form-select editField" id="fontFamily">
+                                                                        <!-- System Fonts -->
+                                                                        <optgroup label="System Fonts">
+                                                                        <option value="Arial, sans-serif">Arial</option>
+                                                                        <option value="'Times New Roman', serif">Times New Roman</option>
+                                                                        <option value="Georgia, serif">Georgia</option>
+                                                                        <option value="'Courier New', monospace">Courier New</option>
+                                                                        <option value="Verdana, sans-serif">Verdana</option>
+                                                                        <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                                                                        </optgroup>
+                                                                        <!-- Google Fonts -->
+                                                                        <optgroup label="Google Fonts">
+                                                                        <option value="'Roboto', sans-serif">Roboto</option>
+                                                                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                                                                        <option value="'Playfair Display', serif">Playfair Display</option>
+                                                                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                                                                        <option value="'Lato', sans-serif">Lato</option>
+                                                                        <option value="'Poppins', sans-serif">Poppins</option>
+                                                                        <option value="'Merriweather', serif">Merriweather</option>
+                                                                        <option value="'Source Code Pro', monospace">Source Code Pro</option>
+                                                                        <option value="'Raleway', sans-serif">Raleway</option>
+                                                                        </optgroup>
+                                                                    </select> 
+                                                                </div>
+                                                            </div>                   
+                                        
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <label for="fontWeight">Font Weight</label>
+                                                                    <select class="form-select editField" id="fontWeight">
+                                                                        <option value="400">Normal (400)</option>
+                                                                        <option value="700">Bold (700)</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="fontStyle">Font Style</label>
+                                                                    <select class="form-select editField" id="fontStyle">
+                                                                        <option value="normal">Normal</option>
+                                                                        <option value="italic">Italic</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="letterSpacing">Letter Spacing (px)</label>
+                                                                    <input class="form-control editField" type="number" id="letterSpacing" value="0" min="-5" max="10" step="0.5"/> 
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="lineHeight">Line Height (multiplier)</label>
+                                                                    <input class="form-control editField" type="number" id="lineHeight" value="1.2" min="0.5" max="3" step="0.1"/>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label>Text Color</label>
+                                                                    <div class="color-group">
+                                                                        <input type="color" id="textColorPicker" value="#1e293b" placeholder="#1e293b"/>
+                                                                        <input type="text" class="form-control editField" id="textColorText" value="#1e293b" placeholder="#1e293b"/>
+                                                                    </div>
+                                                                </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Width (px)</label>
+                                                                    <input class="form-control editField" type="number" id="widthInput" value="500" min="249" max="1000" placeholder="249"> 
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Height (px)</label>
+                                                                    <input class="form-control editField" type="number" id="heightInput" value="500" min="64" max="1000" placeholder="64"> 
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Background</label>
+                                                                   <div class="color-group">
+                                                                        <input type="color" id="bgColorPicker" value="#ffffff" placeholder="#6366f1"/>
+                                                                        <input class="form-control editField" type="text" id="bgColorText" value="#ffffff" placeholder="#6366f1"/>
+                                                                    </div>  
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Border Color</label>
+                                                                    <div class="color-group">
+                                                                        <input type="color" id="borderColorPicker" value="#667eea" placeholder="#667eea"/>
+                                                                        <input type="text" class="form-control editField" id="borderColorText" value="#667eea" placeholder="#667eea"/>
+                                                                    </div>
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Border Width</label>
+                                                                    <input type="number" class="form-control editField" id="borderWidth" value="3" min="0" max="20" placeholder="5">  
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Border Radius</label>
+                                                                    <input type="number" class="form-control editField" id="borderRadius" value="10" min="0" max="100" placeholder="10"/>
+                                                               </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="languageSelect">Translate To</label>
+                                                                    <select class="form-select" id="languageSelect">
+                                                                        <option value="en">English</option>
+                                                                        <option value="fr-CA">Canadian French</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="add-icon-section">
+                                                                <h3><i class="bi bi-file-image"></i> Add Icon</h3>
+                                                                <h4>Upload Image</h4>
+                                                                <input type="file" id="iconUpload" accept="image/*" multiple />
+                                                                <div class="row">
+                                                                    <div class="col-lg-6">
+                                                                        <label for="iconX">Default X (px)</label>
+                                                                        <input class="form-control editField" type="number" id="iconX" value="50"/>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <label for="iconY">Default Y (px)</label>
+                                                                        <input class="form-control editField" type="number" id="iconY" value="50"/>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                         <label for="iconSize">Default Width (px)</label>
+                                                                        <input type="number" class="form-control editField" id="iconSize" value="120" min="16" max="2000"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                             <div class="section">
+                                                                <div class="section-title"><i class="fas fa-list"></i> Elements</div>
+                                                                <div class="element-list" id="elementList">
+                                                                    <p style="text-align:center; color:#94a3b8; font-size:0.8rem;">No elements added</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="btn-section">
+                                                                <button class="applyCta" onclick="applyChanges()">Apply Changes</button>
+                                                                <button class="btn btn-danger" onclick="clearAllElements()">Clear All Elements</button>
+                                                                <button class="reviewCta" onclick="downloadSVG()">Download SVG</button>
+                                                            </div>
+                                                    </div>
+                                                </div>
+                                               </div>
+                                               <div class="col-lg-6">
+                                                  <div class="tab-contents-cta">
+                                                    <div class="previewSection">
+                                                        <div class="uploaded-file" id="referenceCtaPreview">
+                                                            <p class="uploadedText">Reference CTA</p>
+                                                            <div class="uploadedContainer">
+                                                                <div class="uploadedImg">
+                                                                  <!-- Display uploaded SVG here (reference, not editable) -->
+                                                                  <div id="referenceCtaSvgContainer"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                       <div class="previewSection">
+                                                         <p class="uploadedText">Customized CTA</p>
+                                                         <div class="uploadedContainer">
+                                                            <div class="uploaded-file" id="svgPreview">
+                
+                                                                    
+                                                                        <div class="uploadedImg">
+                                                                            <svg width="400" height="100" style="">
+                                                                                <rect width="100%" height="100%" fill="#fff"/>
+                                                                                <text x="50%" y="50%" text-anchor="middle" font-size="24" fill="#333">
+                                                                                    Upload an SVG to begin
+                                                                                </text>
+                                                                            </svg>
+                                                                        </div>
+                                                                    </div>
+                                                            </div>  
+                                                        </div>  
+                                                  </div> 
+                                                  <div class="footerCta">
+                                                    <button type="button" class="saveCta">Send for Approval</button>
+                                                    @if(isset($ticket))
+                                                    <button type="button" class="reviewCta" data-url="{{ $ticket->website_link }}">Go to Review</button>
+                                                    @endif
+                                                </div>
+                                               </div> 
+                                          </div>  
+                                        <!-- CUSTOM UI  -->
+
+                                    </div>
+                                    <div class="tab-pane fade" id="new-tab-png-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                                      <p>PNG</p>
+                                    </div>
+                                    <div class="tab-pane fade" id="new-tab-html-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                                         
+                                        <!-- CUSTOM UI -->
+                                          <div class="row">
+                                               <div class="col-lg-6">
+                                                <div class="tab-contents-cta">
+                                                    <h5>Upload a SVG</h5>
+                                                    <button type="button" class="sampleBtn" onclick="html_loadDefaultSVG()">Edit Sample SVG</button>
+                                                    
+                                                    <div class="editedSection">
+                                                        <button class="mode-btn active" onclick="html_setMode('edit', this)"><i class="bi bi-pencil-fill"></i> Edit Mode</button>
+                                                        <button class="mode-btn erase-mode" onclick="html_setMode('erase', this)"><i class="bi bi-eraser-fill"></i> Erase Mode</button>
+                                                        <label for="textMode">Text Mode</label>
+                                                        <select id="textModehtml">
+                                                            <option value="single">Single Line</option>
+                                                            <option value="multi">Multiline</option>
+                                                        </select>
+                                                        <label for="textContent" class="d-block">Button Text</label>
+                                                        <input type="text" id="textContenthtml" class="form-control editField" value="">
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <label style="font-size: 12px;">X Position (%)</label>
+                                                                    <input class="form-control editField" type="number" id="textXhtml" value="50" min="0" max="100">
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label style="font-size: 12px;">Y Position (%)</label>
+                                                                    <input class="form-control editField" type="number" id="textYhtml" value="50" min="0" max="100">
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="textSize">Text Size</label>
+                                                                    <input class="form-control editField" type="number" id="textSizehtml" value="24" min="12" max="72"/>   
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="fontFamily">Font Family</label>
+                                                                     <select class="form-select editField" id="fontFamilyhtml">
+                                                                        <!-- System Fonts -->
+                                                                        <optgroup label="System Fonts">
+                                                                        <option value="Arial, sans-serif">Arial</option>
+                                                                        <option value="'Times New Roman', serif">Times New Roman</option>
+                                                                        <option value="Georgia, serif">Georgia</option>
+                                                                        <option value="'Courier New', monospace">Courier New</option>
+                                                                        <option value="Verdana, sans-serif">Verdana</option>
+                                                                        <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                                                                        </optgroup>
+                                                                        <!-- Google Fonts -->
+                                                                        <optgroup label="Google Fonts">
+                                                                        <option value="'Roboto', sans-serif">Roboto</option>
+                                                                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                                                                        <option value="'Playfair Display', serif">Playfair Display</option>
+                                                                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                                                                        <option value="'Lato', sans-serif">Lato</option>
+                                                                        <option value="'Poppins', sans-serif">Poppins</option>
+                                                                        <option value="'Merriweather', serif">Merriweather</option>
+                                                                        <option value="'Source Code Pro', monospace">Source Code Pro</option>
+                                                                        <option value="'Raleway', sans-serif">Raleway</option>
+                                                                        </optgroup>
+                                                                    </select> 
+                                                                </div>
+                                                            </div>                   
+                                        
+                                                            <div class="row">
+                                                                <div class="col-lg-6">
+                                                                    <label for="fontWeight">Font Weight</label>
+                                                                    <select class="form-select editField" id="fontWeighthtml">
+                                                                        <option value="400">Normal (400)</option>
+                                                                        <option value="700">Bold (700)</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="fontStyle">Font Style</label>
+                                                                    <select class="form-select editField" id="fontStylehtml">
+                                                                        <option value="normal">Normal</option>
+                                                                        <option value="italic">Italic</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="letterSpacing">Letter Spacing (px)</label>
+                                                                    <input class="form-control editField" type="number" id="letterSpacinghtml" value="0" min="-5" max="10" step="0.5"/> 
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="lineHeight">Line Height (multiplier)</label>
+                                                                    <input class="form-control editField" type="number" id="lineHeighthtml" value="1.2" min="0.5" max="3" step="0.1"/>
+                                                                </div>
+                                                                <div class="col-lg-6">
+                                                                    <label>Text Color</label>
+                                                                    <div class="color-group">
+                                                                        <input type="color" id="textColorPickerhtml" value="#1e293b" placeholder="#1e293b"/>
+                                                                        <input type="text" class="form-control editField" id="textColorTexthtml" value="#1e293b" placeholder="#1e293b"/>
+                                                                    </div>
+                                                                </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Width (px)</label>
+                                                                    <input class="form-control editField" type="number" id="widthInputhtml" value="500" min="249" max="1000" placeholder="249"> 
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Height (px)</label>
+                                                                    <input class="form-control editField" type="number" id="heightInputhtml" value="500" min="64" max="1000" placeholder="64"> 
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Background</label>
+                                                                   <div class="color-group">
+                                                                        <input type="color" id="bgColorPickerhtml" value="#ffffff" placeholder="#6366f1"/>
+                                                                        <input class="form-control editField" type="text" id="bgColorTexthtml" value="#ffffff" placeholder="#6366f1"/>
+                                                                    </div>  
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Border Color</label>
+                                                                    <div class="color-group">
+                                                                        <input type="color" id="borderColorPickerhtml" value="#667eea" placeholder="#667eea"/>
+                                                                        <input type="text" class="form-control editField" id="borderColorTexthtml" value="#667eea" placeholder="#667eea"/>
+                                                                    </div>
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Border Width</label>
+                                                                    <input type="number" class="form-control editField" id="borderWidthhtml" value="3" min="0" max="20" placeholder="5">  
+                                                               </div>
+                                                               <div class="col-lg-6">
+                                                                    <label>Border Radius</label>
+                                                                    <input type="number" class="form-control editField" id="borderRadiushtml" value="10" min="0" max="100" placeholder="10"/>
+                                                               </div>
+                                                                <div class="col-lg-6">
+                                                                    <label for="languageSelect">Translate To</label>
+                                                                    <select class="form-select" id="languageSelecthtml">
+                                                                        <option value="en">English</option>
+                                                                        <option value="fr-CA">Canadian French</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="add-icon-section">
+                                                                <h3><i class="bi bi-file-image"></i> Add Icon</h3>
+                                                                <h4>Upload Image</h4>
+                                                                <input type="file" id="iconUploadhtml" accept="image/*" multiple />
+                                                                <div class="row">
+                                                                    <div class="col-lg-6">
+                                                                        <label for="iconX">Default X (px)</label>
+                                                                        <input class="form-control editField" type="number" id="iconXhtml" value="50"/>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <label for="iconY">Default Y (px)</label>
+                                                                        <input class="form-control editField" type="number" id="iconYhtml" value="50"/>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                         <label for="iconSize">Default Width (px)</label>
+                                                                        <input type="number" class="form-control editField" id="iconSizehtml" value="120" min="16" max="2000"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                             <div class="section">
+                                                                <div class="section-title"><i class="fas fa-list"></i> Elements</div>
+                                                                <div class="element-list" id="elementListhtml">
+                                                                    <p style="text-align:center; color:#94a3b8; font-size:0.8rem;">No elements added</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="btn-section">
+                                                                <button class="applyCta" onclick="html_applyChanges()">Apply Changes</button>
+                                                                <button class="btn btn-danger" onclick="html_clearAllElements()">Clear All Elements</button>
+                                                                <button class="reviewCta" onclick="html_downloadSVG()">Download SVG</button>
+                                                            </div>
+                                                    </div>
+                                                </div>
+                                               </div>
+                                               <div class="col-lg-6">
+                                                  <div class="tab-contents-cta">
+                                                       <div class="previewSection">
+                                                            <div class="uploaded-file" id="htmlPreview">
+                                                                    <p class="uploadedText">Uploaded File</p>
+                                                                    <div class="uploadedContainer">
+                                                                        <div class="uploadedImg">
+                                                                            <svg width="400" height="100">
+                                                                                <rect width="100%" height="100%" fill="#fff"/>
+                                                                                <text x="50%" y="50%" text-anchor="middle" font-size="24" fill="#333">
+                                                                                    Upload an SVG to begin
+                                                                                </text>
+                                                                            </svg>
+                                                                        </div>
+                                                                    </div>
+                                                            </div>  
+                                                        </div>  
+                                                  </div> 
+                                                  <div class="footerCta">
+                                                    <button type="button" class="saveCta">Send for Approval</button>
+                                                    <button type="button" class="reviewCta">Go to Review</button>
+                                                </div>
+                                               </div> 
+                                          </div>  
+                                        <!-- CUSTOM UI  -->
+                                    </div>
+                                </div>
+                          </div>
+                        <!-- TAB CONTENT START -->
+
+                        </section>
+                        <!-- TAB CONTAINER -->
+                </div>
+            </div>
+    </section>
+                                                          
+    <!--  -->
+    
+
+    <!--  -->
+@if(isset($action))                      
+@if($action == 'edit')
+<script>
+$(document).ready(function() {
+//   alert(1);
+    $('.createCtaContainer').show();  // show by default
+    $('.createTaskInfo').addClass('cta-event-disable'); // optional: disable fields
+});
+</script>
+@endif
+@endif
+</body>
+</html>
+
+
+<script>
+  $(document).on('click', '.reviewCta', function () {
+    let url = $(this).data('url');
+
+    if (!url) {
+        alert("No website link available!");
+        return;
+    }
+
+    window.open(url, '_blank');
+  });
+</script>
+<script>
+$(function() {
+    const dbConnection = "{{ session('db_connection') }}"; // mysql2 = US, mysql = CA
+
+    // Dealer code input restriction
+    $('#DealerCode').on('input', function(e) {
+        
+        let val = $(this).val();
+
+        if (dbConnection === 'mysql2') {
+            // US → only digits
+            val = val.replace(/\D/g, '');
+            $(this).val(val);
+
+            // Fetch website when 5 digits entered
+            if (val.length === 5) {
+                fetchWebsiteLink(val);
+            }
+        } else if (dbConnection === 'mysql') {
+            // CA → alphanumeric
+            val = val.replace(/[^a-zA-Z0-9]/g, '');
+            $(this).val(val);
+
+            // Fetch website when 6 chars entered
+            if (val.length === 6) {
+                fetchWebsiteLink(val);
+            }
+        }
+    });
+
+    // Function to fetch website link from backend
+    function fetchWebsiteLink(dealerCode) {
+        
+        $.ajax({
+            url: "{{ route('get.website.link') }}", // Create this route
+            type: "GET",
+            data: { dealer_code: dealerCode },
+            success: function(response) {
+                if (response.website_link) {
+                    $('#website').val(response.website_link);
+                } else {
+                    $('#website').val('');
+                    alert('No website link found for this dealer.');
+                }
+            },
+            error: function() {
+                alert('Error fetching website link.');
+            }
+        });
+    }
+});
+
+
+
+
+</script>
+<script>
+$(document).ready(function() {
+
+    // FORM SUBMIT HANDLER (VALIDATION SAFE)
+    $('#ticketForm').on('submit', function(e) {
+
+        // Browser HTML validation automatically runs before this event.
+        // If any required fields are empty → this code will NOT execute.
+
+        e.preventDefault(); // stop reload
+
+        let form = $(this);
+        let formData = form.serialize();
+
+        $.ajax({
+            url: form.attr('action'),
+            method: "POST",
+            data: formData,
+            success: function(res) {
+
+                if (res.success) {
+
+                    alert(res.message);
+
+                    // Disable fields
+                    $('.createTaskInfo').addClass('cta-event-disable');
+                    $('.editCtaContainer').show();
+
+                    // store task_id for next Update
+                    if (res.task_id) {
+                        $('#task_id').val(res.task_id);
+                    }
+                    $('.createCtaContainer').css({
+                        'display': 'block'
+                    });
+
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                    let errors = xhr.responseJSON.errors;
+                    let msg = "";
+
+                    $.each(errors, function(key, value) {
+                        msg += value + "\n";
+                    });
+
+                    alert(msg);
+                }
+            }
+        });
+
+    });
+
+    // EDIT BUTTON CLICK
+    $(document).on('click', '.editCta', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        $('.createTaskInfo').removeClass('cta-event-disable');
+        $('.editCtaContainer').hide();
+    });
+
+});
+</script>
+
+
+  
+
+
+<script>
+  $('#uploadCustomPartImage').on('submit', function(event) {
+    event.preventDefault();
+    $("#api__ajax_loader").show();
+
+    var formData = new FormData(this);
+    formData.append('total_parts', $('.accordion-item').length); 
+    // include CSRF token for Laravel
+    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+
+    $.ajax({
+        method: 'POST',
+        url: 'upload_custom_part_image',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+            console.log('data', data);
+            UpdateDealerCustomParts(data);
+            //$('#uploadCustomPartImage')[0].reset(); // Reset the form
+            $('#uploadCustomPartImage input[type="file"]').val('');
+        }
+    });
+});
+</script>
+
+<script>
+// Set global CSRF header for all jQuery AJAX requests (robust fallback)
+$.ajaxSetup({
+  headers: {
+    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  }
+});
+
+  $(document).on('click', '.saveCta', function () {
+    const svgEl = document.querySelector('#svgPreview svg');
+    if (!svgEl) { alert('No SVG to save! Please upload or create a SVG first.'); return; }
+
+    // create raw backup (original DOM SVG markup)
+    $('#svg_backup').val(svgEl.outerHTML);
+
+    // build exported source that matches the downloadable SVG
+    const exportedSource = exportSVGSource();
+    if (!exportedSource) { alert('Unable to create export SVG.'); return; }
+
+    const blob = new Blob([exportedSource], { type: 'image/svg+xml;charset=utf-8' });
+
+    const formData = new FormData();
+    formData.append('dealer_code', $('#DealerCode').val() || '');
+    formData.append('button_text', $('#textContent').val() || '');
+    // append CSRF token to FormData as an explicit fallback
+    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+    // server side will receive 'svg_file' as the exported svg file (same content as download)
+    formData.append('svg_file', blob, 'edited-svg.svg');
+    // include serialized svg string as 'svg' so server-side validation passes
+    formData.append('svg', exportedSource);
+    // also include raw SVG backup for traceability
+    formData.append('svg_backup', $('#svg_backup').val());
+
+    $.ajax({
+        url: "/upload-svg-temp",
+        method: "POST",
+        processData: false,
+        contentType: false,
+        data: formData,
+        success: function (res) {
+            alert("SVG saved locally!");
+            // populate inputs if API returns file_url (backwards-compatible)
+            if (res && res.file_url) {
+                $('#button_image_url').val(res.file_url);
+                $('#button_image_url_vdp').val(res.file_url);
+                $('#button_image_url_cpov').val(res.file_url);
+                $('#preview_button_image_url').attr('href', res.file_url);
+                $('#preview_button_image_url_vdp').attr('href', res.file_url);
+                $('#preview_button_image_url_cpov').attr('href', res.file_url);
+            }
+        },
+        error: function (err) {
+            console.error(err);
+            alert("Save failed");
+        }
+    });
+  });
+</script>
+<script>
+  let currentSVG = null;
+    let selectedIcon = '';
+    let currentMode = 'edit';
+    let addedElements = [];
+    let originalTexts = new WeakMap();
+    let dragged = null;
+    let offset = { x: 0, y: 0 };
+    let currentViewBox = { w: 500, h: 500 };
+    let selectedElement = null;
+    let selectionBox = null;
+
+
+    const translations = {
+      'en': {},
+      'fr-CA': {
+        'hello': 'Bonjour',
+        'welcome': 'Bienvenue',
+        'thank you': 'Merci',
+        'yes': 'Oui',
+        'no': 'Non',
+        'upload an svg to begin': 'Téléchargez un SVG pour commencer',
+        'edit': 'Éditer',
+        'erase': 'Effacer'
+      }
+    };
+
+    // ---------- FILE UPLOAD (SVG) ----------
+    document.getElementById('svgUpload').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file && file.type === 'image/svg+xml') {
+        const reader = new FileReader();
+        reader.onload = async function (event) {
+          currentSVG = event.target.result;
+          displaySVG();
+          await applyTranslation();
+           // Show reference SVG in referenceCtaSvgContainer
+          document.getElementById('referenceCtaSvgContainer').innerHTML = event.target.result;
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    // ---------- COLOR SYNC ----------
+    document.getElementById('borderColorPicker').addEventListener('input', e => {
+      document.getElementById('borderColorText').value = e.target.value;
+      // update live visuals when user uses the color picker
+      try { applyVisualStyles(); } catch (err) {}
+    });
+    document.getElementById('borderColorText').addEventListener('input', e => {
+      document.getElementById('borderColorPicker').value = e.target.value;
+      try { applyVisualStyles(); } catch (err) {}
+    });
+    document.getElementById('textColorPicker').addEventListener('input', e => {
+      document.getElementById('textColorText').value = e.target.value;
+      try { updatePreviewText(); } catch (err) {}
+    });
+    document.getElementById('textColorText').addEventListener('input', e => {
+      document.getElementById('textColorPicker').value = e.target.value;
+      try { updatePreviewText(); } catch (err) {}
+    });
+    document.getElementById('bgColorPicker').addEventListener('input', e => {
+      document.getElementById('bgColorText').value = e.target.value;
+      try { applyVisualStyles(); } catch (err) {}
+    });
+    document.getElementById('bgColorText').addEventListener('input', e => {
+      document.getElementById('bgColorPicker').value = e.target.value;
+      try { applyVisualStyles(); } catch (err) {}
+    });
+
+    // ---------- ICON IMAGE UPLOAD (multiple images, default placement, draggable) ----------
+    // We'll accept multiple files from #iconUpload and insert each as an <image> into the current svg.
+    const uploadInput = document.getElementById("iconUpload");
+    const iconX = document.getElementById("iconX");
+    const iconY = document.getElementById("iconY");
+    const iconSize = document.getElementById("iconSize");
+
+    uploadInput.addEventListener("change", function () {
+        const files = Array.from(this.files || []);
+        if (!files.length) return;
+
+        // Insert each file
+        files.forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const base64 = e.target.result;
+                insertUploadedImage(base64, file.name);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // clear the input so same file can be picked again if needed
+        this.value = '';
+    });
+
+    // Insert image into current SVG with default px placement, convert to viewBox units
+    function insertUploadedImage(base64url, filename) {
+        const svg = document.querySelector('#svgPreview svg');
+        if (!svg) {
+            console.error('No SVG available to insert image into.');
+            return;
+        }
+
+        // Ensure xlink namespace exists
+        if (!svg.getAttribute('xmlns:xlink')) svg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+
+        // default pixel placement (Option A)
+        const defaultXpx = parseFloat(iconX.value) || 50;   // we still respect the default inputs if user changed them
+        const defaultYpx = parseFloat(iconY.value) || 50;
+        const defaultWpx = parseFloat(iconSize.value) || 120;
+
+        // Convert px to viewBox units
+        const viewBox = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+        const vbWidth = viewBox[2];
+        const vbHeight = viewBox[3];
+
+        // container (visible) pixel size
+        // Use the SVG's actual rendered pixel size to compute scale so
+        // editor chrome (borders) applied to the container don't change
+        // the conversion from px -> viewBox units.
+        const svgRect = svg.getBoundingClientRect();
+        const containerW = svgRect.width || svg.parentElement.clientWidth || vbWidth;
+        const containerH = svgRect.height || svg.parentElement.clientHeight || vbHeight;
+
+        // scale to convert px -> viewBox units (use width-based scale)
+        const scale = vbWidth / (containerW || vbWidth);
+
+        const x_vb = defaultXpx * scale;
+        const y_vb = defaultYpx * scale;
+        const w_vb = defaultWpx * scale;
+
+        // Create SVG <image>
+        const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', base64url);
+
+        // To preserve aspect ratio, we need natural image dimensions — create an Image object
+        const tmpImg = new Image();
+        tmpImg.onload = function() {
+            const natW = tmpImg.naturalWidth || 1;
+            const natH = tmpImg.naturalHeight || 1;
+            const aspect = natH / natW;
+            const h_vb = w_vb * aspect;
+
+            imgEl.setAttribute('x', String(x_vb));
+            imgEl.setAttribute('y', String(y_vb));
+            imgEl.setAttribute('width', String(w_vb));
+            imgEl.setAttribute('height', String(h_vb));
+            imgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+            const id = 'img-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+            imgEl.setAttribute('data-element-id', id);
+
+          // store natural size and base px width so we can update size later
+          imgEl.setAttribute('data-natw', String(natW));
+          imgEl.setAttribute('data-nath', String(natH));
+          imgEl.setAttribute('data-base-width-px', String(defaultWpx));
+
+            svg.appendChild(imgEl);
+
+            // Record in addedElements list
+            addedElements.push({ id, type: 'image', content: filename || 'uploaded-image' });
+
+            // Make interactive
+            reapplyInteractivity();
+            updateElementList();
+        };
+        tmpImg.src = base64url;
+    }
+
+    // ---------- LANGUAGE CHANGE ----------
+    // When language changes, translate existing SVG texts AND update
+    // the live textarea preview (without overwriting user input).
+    document.getElementById('languageSelect').addEventListener('change', async () => {
+      await applyTranslation();
+      try {
+        const lang = document.getElementById('languageSelect').value;
+        const raw = (document.getElementById('textContent').value || '').trim();
+        if (raw) {
+          const translated = await translateText(raw, lang);
+          updatePreviewText(translated);
+        }
+      } catch (err) { console.error(err); }
+    });
+
+    // ---------- TEXT MODE TOGGLE ----------
+    document.getElementById('textMode').addEventListener('change', function(e) {
+      const multilineOptions = document.getElementById('multilineOptions');
+      if (e.target.value === 'multi') {
+        multilineOptions.style.display = 'block';
+      } else {
+        multilineOptions.style.display = 'none';
+      }
+    });
+
+    // ---------- MODE SWITCH ----------
+    function setMode(mode, btn) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+      btn.classList.add('active');
+      const svg = document.querySelector('#svgPreview svg');
+      if (svg) {
+        if (mode === 'erase') {
+          svg.classList.add('erase-cursor');
+          makeElementsErasable();
+        } else {
+          svg.classList.remove('erase-cursor');
+          removeErasableClasses();
+        }
+      }
+      reapplyInteractivity();
+    }
+
+    // ---------- DISPLAY SVG ----------
+    function displaySVG() {
+      if (!currentSVG) return;
+
+      const parser = new DOMParser();
+      const svgDoc = parser.parseFromString(currentSVG, 'image/svg+xml');
+      const svgElement = svgDoc.documentElement;
+
+      // Ensure xlink namespace exists on the inserted SVG
+      if (!svgElement.getAttribute('xmlns:xlink')) svgElement.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+
+      const preview = document.getElementById('svgPreview');
+      function getNaturalSize(el, container) {
+        const vbAttr = el.getAttribute('viewBox');
+        if (vbAttr) {
+          const parts = vbAttr.trim().split(/\s+/).map(Number);
+          if (parts.length === 4 && parts[2] && parts[3]) return { w: parts[2], h: parts[3] };
+        }
+        const wAttr = el.getAttribute('width');
+        const hAttr = el.getAttribute('height');
+        const isPercent = s => typeof s === 'string' && s.trim().endsWith('%');
+        if (wAttr && hAttr && !isPercent(wAttr) && !isPercent(hAttr)) {
+          const wnum = parseFloat(wAttr); const hnum = parseFloat(hAttr);
+          if (!Number.isNaN(wnum) && !Number.isNaN(hnum) && wnum > 0 && hnum > 0) return { w: wnum, h: hnum };
+        }
+        try {
+          const alreadyInDom = container.contains(el);
+          if (!alreadyInDom) container.appendChild(el);
+          const rect = el.getBoundingClientRect();
+          if (rect.width && rect.height) { if (!alreadyInDom) container.removeChild(el); return { w: Math.round(rect.width), h: Math.round(rect.height) }; }
+          if (!alreadyInDom) container.removeChild(el);
+        } catch (e) {}
+        return { w: 400, h: 400 };
+      }
+
+      const size = getNaturalSize(svgElement, preview);
+      let origW = size.w; let origH = size.h;
+
+      document.getElementById("widthInput").value = origW;
+      document.getElementById("heightInput").value = origH;
+
+      let viewBox = svgElement.getAttribute('viewBox');
+      if (!viewBox) {
+        const w = svgElement.getAttribute('width') || origW || 400;
+        const h = svgElement.getAttribute('height') || origH || 400;
+        viewBox = `0 0 ${w} ${h}`;
+        svgElement.setAttribute('viewBox', viewBox);
+      }
+
+  // Set explicit pixel width/height on the inserted SVG so the preview
+  // reflects the SVG's natural coordinate system exactly and does not
+  // get scaled by surrounding CSS (padding, borders, flex sizing).
+  // We keep the viewBox for internal coordinates but also set physical
+  // width/height to the computed natural size in pixels.
+  svgElement.setAttribute('width', String(origW));
+  svgElement.setAttribute('height', String(origH));
+  svgElement.style.width = `${origW}px`;
+  svgElement.style.height = `${origH}px`;
+
+      // Set a normalized viewBox based on the computed natural size
+      svgElement.setAttribute("viewBox", `0 0 ${origW} ${origH}`);
+
+      preview.innerHTML = '';
+      preview.appendChild(svgElement);
+
+      // Ensure background rect
+      let bgRect = svgElement.querySelector('rect[data-background="true"]');
+      if (!bgRect) {
+        bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        bgRect.setAttribute('width', '100%');
+        bgRect.setAttribute('height', '100%');
+        bgRect.setAttribute('fill', document.getElementById('bgColorText').value);
+        bgRect.setAttribute('data-background', 'true');
+        svgElement.insertBefore(bgRect, svgElement.firstChild);
+      }
+
+  // Match original size (use numeric values to avoid percentage rounding)
+  bgRect.setAttribute("x", 0);
+  bgRect.setAttribute("y", 0);
+  bgRect.setAttribute("width", String(origW));
+  bgRect.setAttribute("height", String(origH));
+
+      // Store original texts (preserve original casing) so we can recreate
+      // the English/original version exactly when exporting.
+      svgElement.querySelectorAll('text').forEach(text => {
+        if (!originalTexts.has(text)) {
+          originalTexts.set(text, text.textContent.trim());
+        }
+      });
+
+      applyVisualStyles();
+      reapplyInteractivity();
+      addedElements = [];
+      updateElementList();
+      // update live preview text if user is typing
+      try { updatePreviewText(); } catch (e) { /* ignore if preview not ready */ }
+    }
+
+    // ---------- UPDATE UPLOADED IMAGES SIZE ----------
+    function updateUploadedImagesSize() {
+      const svg = document.querySelector('#svgPreview svg');
+      if (!svg) return;
+
+      const images = Array.from(svg.querySelectorAll('image[data-natw]'));
+      if (!images.length) return;
+
+      const iconSizePx = parseFloat(document.getElementById('iconSize').value) || 120;
+
+      // compute scale from container pixels -> viewBox units
+      const viewBox = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+      const vbWidth = viewBox[2];
+
+      // Use SVG's rendered rect to compute pixel->viewBox scale so
+      // changes to container borders or padding don't affect icon sizing.
+      const svgRect = svg.getBoundingClientRect();
+      const containerW = svgRect.width || svg.parentElement.clientWidth || vbWidth;
+      const scale = vbWidth / (containerW || vbWidth);
+
+      images.forEach(img => {
+        // natural aspect ratio
+        const natW = parseFloat(img.getAttribute('data-natw')) || 1;
+        const natH = parseFloat(img.getAttribute('data-nath')) || 1;
+        const aspect = natH / natW;
+
+        // compute new width in viewBox units from requested px width
+        const w_vb = iconSizePx * scale;
+        const h_vb = w_vb * aspect;
+
+        img.setAttribute('width', String(w_vb));
+        img.setAttribute('height', String(h_vb));
+      });
+    }
+
+    // ---------- VISUAL STYLES ----------
+    function applyVisualStyles() {
+      const svg = document.querySelector('#svgPreview svg');
+      if (!svg) return;
+
+      const width = parseFloat(document.getElementById('widthInput').value);
+      const height = parseFloat(document.getElementById('heightInput').value);
+      const borderColor = document.getElementById('borderColorText').value;
+      const borderWidth = parseFloat(document.getElementById('borderWidth').value);
+      const borderRadius = parseFloat(document.getElementById('borderRadius').value);
+      const bgColor = document.getElementById('bgColorText').value;
+
+    const container = document.getElementById('svgPreview');
+  container.style.width = `${width}px`;
+  container.style.height = `${height}px`;
+
+  // Present the editor border on the preview container so the SVG
+  // stays free of editor chrome. The container will clip its
+  // contents using overflow:hidden so the rounded corners look
+  // correct while inner shapes keep rectangular corners.
+  container.style.border = `${borderWidth}px solid ${borderColor}`;
+  container.style.borderRadius = `${borderRadius}px`;
+  container.style.overflow = 'hidden';
+
+  // Update the SVG physical size to match the container but do not
+  // add a CSS border on the SVG itself (avoid double borders).
+  svg.setAttribute('width', String(width));
+  svg.setAttribute('height', String(height));
+  svg.style.width = `${width}px`;
+  svg.style.height = `${height}px`;
+  svg.style.border = 'none';
+  svg.style.borderRadius = '0';
+  svg.style.overflow = 'visible';
+
+      const bgRect = svg.querySelector('rect[data-background="true"]');
+      if (!bgRect) {
+        bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        bgRect.setAttribute("data-background", "true");
+        svg.insertBefore(bgRect, svg.firstChild);
+      }
+      
+      bgRect.setAttribute("x", 0);
+      bgRect.setAttribute("y", 0);
+      bgRect.setAttribute("width", width);
+      bgRect.setAttribute("height", height);
+      bgRect.setAttribute("fill", bgColor);
+      // Keep inner background rectangular; rounded corners are handled
+      // by the preview container's border-radius/clipping so we avoid
+      // a double rounded inner shape.
+      bgRect.setAttribute("rx", 0);
+
+    
+        // Remove any internal stroke rect used previously for an
+        // editor border so we don't show a double border. The visible
+        // border is rendered on the container element above.
+        const existingBorderRect = svg.querySelector('rect[data-border="true"]');
+        if (existingBorderRect) existingBorderRect.remove();
+
+    }
+
+    // ---------- TEXT WRAPPING HELPER ----------
+    function wrapText(text, maxWidth, fontSize, fontFamily) {
+      // Split by explicit line breaks first (user-entered newlines)
+      const explicitLines = text.split('\n');
+      const allLines = [];
+      
+      // Simple approach: estimate characters per line based on maxWidth
+      // Average character width ≈ 0.55 * fontSize (works for most fonts)
+      const avgCharWidth = fontSize * 0.55;
+      const charsPerLine = Math.max(1, Math.floor(maxWidth / avgCharWidth));
+      
+      for (const line of explicitLines) {
+        const trimmedLine = line.trim();
+        if (trimmedLine === '') {
+          allLines.push(''); // preserve empty lines
+          continue;
+        }
+        
+        // Word wrap each explicit line
+        const words = trimmedLine.split(' ');
+        let currentLine = '';
+        
+        for (const word of words) {
+          const testLine = currentLine + (currentLine ? ' ' : '') + word;
+          
+          if (testLine.length > charsPerLine && currentLine) {
+            // Current word doesn't fit, push current line and start new one
+            allLines.push(currentLine.trim());
+            currentLine = word;
+          } else {
+            // Word fits, add it to current line
+            currentLine = testLine;
+          }
+        }
+        
+        if (currentLine.trim()) {
+          allLines.push(currentLine.trim());
+        }
+      }
+      
+      return allLines.length > 0 ? allLines : [''];
+    }
+
+    // ---------- TRANSLATION HELPERS ----------
+    async function translateText(original, targetLang) {
+      if (!original) return '';
+
+      // Normalize whitespace and casing for key lookups
+      const normalized = original.replace(/\s+/g, ' ').trim();
+      const key = normalized.toLowerCase();
+
+      // First try built-in translations map (fast, offline)
+      if (targetLang !== 'en' && translations[targetLang] && translations[targetLang][key]) {
+        return translations[targetLang][key];
+      }
+
+      // If target is French (or any fr-*), try the external API as a fallback
+      if (String(targetLang).toLowerCase().startsWith('fr')) {
+        try {
+          const resp = await fetch(
+            `https://api.mymemory.translated.net/get?q=${encodeURIComponent(normalized)}&langpair=en|fr`
+          );
+          const data = await resp.json();
+          if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
+        } catch (err) {
+          console.error('Translation API error:', err);
+        }
+      }
+
+      // No translation available — return the original normalized text
+      return normalized;
+    }
+
+    async function applyTranslation() {
+      const svg = document.querySelector('#svgPreview svg');
+      if (!svg) return;
+
+      const lang = document.getElementById('languageSelect').value;
+      const texts = svg.querySelectorAll('text');
+
+      for (const txt of texts) {
+        // Prefer the stored original text if available; otherwise use the
+        // current node text as the source (this handles text nodes that
+        // were created after the original mapping was made).
+        const storedOrig = originalTexts.get(txt);
+        const sourceText = (storedOrig && storedOrig.toString().trim()) || (txt.textContent || '').trim();
+        if (!sourceText) continue;
+        try {
+          const translated = await translateText(sourceText, lang);
+          txt.textContent = translated;
+        } catch (e) {
+          console.error('applyTranslation error for text', sourceText, e);
+        }
+      }
+      // If selected language is not English, show an alternate preview
+      // containing the original English texts side-by-side.
+      if (lang && lang !== 'en') {
+        try { createAlternatePreview(); } catch (e) { console.error(e); }
+      } else {
+        removeAlternatePreview();
+      }
+    }
+
+    // Create an alternate preview SVG showing original English texts.
+    function createAlternatePreview() {
+      // remove existing if any
+      removeAlternatePreview();
+      const liveSvg = document.querySelector('#svgPreview svg');
+      if (!liveSvg) return;
+
+      // Collect original texts in order from the live DOM
+      const liveTexts = Array.from(liveSvg.querySelectorAll('text'));
+      const originals = liveTexts.map(t => originalTexts.get(t) || (t.textContent || '').trim());
+
+      // Clone the live SVG and replace text nodes with originals
+      const altSvg = liveSvg.cloneNode(true);
+      const altTexts = Array.from(altSvg.querySelectorAll('text'));
+      altTexts.forEach((t, i) => {
+        if (originals[i]) t.textContent = originals[i];
+      });
+
+      // Wrap in a container for labeling
+      const altContainer = document.createElement('div');
+      altContainer.id = 'svgPreviewAlt';
+      altContainer.style.display = 'inline-block';
+      altContainer.style.marginLeft = '12px';
+      altContainer.style.verticalAlign = 'top';
+      altContainer.appendChild(altSvg);
+
+      // Add a small caption
+      const cap = document.createElement('div');
+      cap.textContent = 'English (Original)';
+      cap.style.textAlign = 'center';
+      cap.style.fontSize = '12px';
+      cap.style.color = '#334155';
+      cap.style.marginTop = '6px';
+      altContainer.appendChild(cap);
+
+      // Insert after the main preview container
+      const previewArea = document.querySelector('.preview-area');
+      if (previewArea) previewArea.appendChild(altContainer);
+    }
+
+    function removeAlternatePreview() {
+      const existing = document.getElementById('svgPreviewAlt');
+      if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+    }
+
+    // ---------- LIVE PREVIEW FOR TEXT INPUTS ----------
+    function updatePreviewText(translatedOverride) {
+      const svg = document.querySelector('#svgPreview svg');
+      if (!svg) return;
+
+      // remove any existing transient preview element
+      const existing = svg.querySelector('[data-preview="true"]');
+      if (existing) existing.remove();
+      const rawText = (typeof translatedOverride === 'string' && translatedOverride !== undefined)
+        ? translatedOverride
+        : (document.getElementById('textContent').value || '');
+      if (!rawText.trim()) return; // nothing to preview
+
+      const textMode = document.getElementById('textMode').value;
+      const size = parseFloat(document.getElementById('textSize').value) || 16;
+      const color = document.getElementById('textColorText').value || '#000';
+      const fontFamily = document.getElementById('fontFamily').value;
+      const fontWeight = document.getElementById('fontWeight').value;
+      const fontStyle = document.getElementById('fontStyle').value;
+      const letterSpacing = document.getElementById('letterSpacing').value;
+      const lineHeight = document.getElementById('lineHeight').value;
+      const x = document.getElementById('textX').value;
+      const y = document.getElementById('textY').value;
+
+      if (textMode === 'single') {
+        const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textEl.setAttribute('data-preview', 'true');
+        textEl.setAttribute('x', `${x}%`);
+        textEl.setAttribute('y', `${y}%`);
+        textEl.setAttribute('text-anchor', 'middle');
+        textEl.setAttribute('dominant-baseline', 'middle');
+        textEl.setAttribute('font-size', size);
+        textEl.setAttribute('font-family', fontFamily);
+        textEl.setAttribute('font-weight', fontWeight);
+        textEl.setAttribute('font-style', fontStyle);
+        textEl.setAttribute('letter-spacing', letterSpacing);
+        textEl.setAttribute('fill', color);
+        textEl.setAttribute('opacity', '0.85');
+        textEl.textContent = rawText;
+        svg.appendChild(textEl);
+      } else {
+        // multiline preview: wrap and position in viewBox coordinates
+        const wrapWidth = parseFloat(document.getElementById('textWrapWidth').value) || 300;
+        const lines = wrapText(rawText, wrapWidth, size, fontFamily);
+
+        // Convert percentage coords to viewBox units
+        const viewBox = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+        const vbWidth = viewBox[2];
+        const vbHeight = viewBox[3];
+        const xAbs = (parseFloat(x) / 100) * vbWidth;
+        const yAbs = (parseFloat(y) / 100) * vbHeight;
+
+        const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textEl.setAttribute('data-preview', 'true');
+        textEl.setAttribute('x', xAbs);
+        textEl.setAttribute('y', yAbs);
+        textEl.setAttribute('text-anchor', 'middle');
+        textEl.setAttribute('dominant-baseline', 'middle');
+        textEl.setAttribute('font-size', size);
+        textEl.setAttribute('font-family', fontFamily);
+        textEl.setAttribute('font-weight', fontWeight);
+        textEl.setAttribute('font-style', fontStyle);
+        textEl.setAttribute('letter-spacing', letterSpacing);
+        textEl.setAttribute('fill', color);
+        textEl.setAttribute('opacity', '0.85');
+
+        const lineHeight_val = parseFloat(lineHeight) || 1.2;
+        const lineSpacing = size * lineHeight_val;
+
+        lines.forEach((line, index) => {
+          const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+          tspan.setAttribute('x', xAbs);
+          if (index === 0) {
+            const totalHeight = (lines.length - 1) * lineSpacing;
+            const offset = -totalHeight / 2;
+            if (offset !== 0) tspan.setAttribute('dy', offset);
+          } else {
+            tspan.setAttribute('dy', lineSpacing);
+          }
+          tspan.textContent = line;
+          textEl.appendChild(tspan);
+        });
+
+        svg.appendChild(textEl);
+      }
+    }
+
+    // ---------- APPLY CHANGES ----------
+    async function applyChanges() {
+      if (!currentSVG) {
+        alert('Please upload an SVG file first!');
+        return;
+      }
+
+      const svg = document.querySelector('#svgPreview svg');
+      if (!svg) return;
+
+      applyVisualStyles();
+
+      const lang = document.getElementById('languageSelect').value;
+
+      // ---- ADD TEXT ----
+      const rawText = document.getElementById('textContent').value.trim();
+      if (rawText) {
+        const translated = await translateText(rawText, lang);
+        const size = document.getElementById('textSize').value;
+        const color = document.getElementById('textColorText').value;
+        const fontFamily = document.getElementById('fontFamily').value;
+        const fontWeight = document.getElementById('fontWeight').value;
+        const fontStyle = document.getElementById('fontStyle').value;
+        const letterSpacing = document.getElementById('letterSpacing').value;
+        const lineHeight = document.getElementById('lineHeight').value;
+        const textMode = document.getElementById('textMode').value;
+        const x = document.getElementById('textX').value;
+        const y = document.getElementById('textY').value;
+
+        if (textMode === 'single') {
+          // ---- SINGLE LINE TEXT ----
+          const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          textEl.setAttribute('x', `${x}%`);
+          textEl.setAttribute('y', `${y}%`);
+          textEl.setAttribute('text-anchor', 'middle');
+          textEl.setAttribute('font-size', size);
+          textEl.setAttribute('font-family', fontFamily);
+          textEl.setAttribute('font-weight', fontWeight);
+          textEl.setAttribute('font-style', fontStyle);
+          textEl.setAttribute('letter-spacing', letterSpacing);
+          textEl.setAttribute('line-height', lineHeight);
+          textEl.setAttribute('fill', color);
+          textEl.textContent = translated;
+
+          const id = 'text-' + Date.now();
+          textEl.setAttribute('data-element-id', id);
+          originalTexts.set(textEl, rawText.trim());
+
+          svg.appendChild(textEl);
+          addedElements.push({ id, type: 'text', content: translated });
+        } else {
+          // ---- MULTILINE TEXT ----
+          const wrapWidth = parseFloat(document.getElementById('textWrapWidth').value);
+          const lines = wrapText(translated, wrapWidth, size, fontFamily);
+          
+          // Get viewBox dimensions to convert percentages to absolute coordinates
+          const viewBox = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+          const vbWidth = viewBox[2];
+          const vbHeight = viewBox[3];
+          
+          // Convert percentage to absolute viewBox coordinates
+          const xAbs = (parseFloat(x) / 100) * vbWidth;
+          const yAbs = (parseFloat(y) / 100) * vbHeight;
+          
+          // Create a single text element with tspan for each line
+          const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          const textId = 'text-' + Date.now();
+          textEl.setAttribute('data-element-id', textId);
+          textEl.setAttribute('x', xAbs);
+          textEl.setAttribute('y', yAbs);
+          textEl.setAttribute('text-anchor', 'middle');
+          textEl.setAttribute('dominant-baseline', 'middle');
+          textEl.setAttribute('font-size', size);
+          textEl.setAttribute('font-family', fontFamily);
+          textEl.setAttribute('font-weight', fontWeight);
+          textEl.setAttribute('font-style', fontStyle);
+          textEl.setAttribute('letter-spacing', letterSpacing);
+          textEl.setAttribute('fill', color);
+          
+          // Calculate line spacing
+          const lineHeight_val = parseFloat(lineHeight);
+          const lineSpacing = size * lineHeight_val;
+          
+          // Add tspan for each line
+          lines.forEach((line, index) => {
+            const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+            tspan.setAttribute('x', xAbs);
+            
+            // First line gets negative dy to center, rest get positive dy for spacing
+            if (index === 0) {
+              const totalHeight = (lines.length - 1) * lineSpacing;
+              const offset = -totalHeight / 2;
+              if (offset !== 0) {
+                tspan.setAttribute('dy', offset);
+              }
+            } else {
+              tspan.setAttribute('dy', lineSpacing);
+            }
+            
+            tspan.textContent = line;
+            textEl.appendChild(tspan);
+          });
+          
+          svg.appendChild(textEl);
+          addedElements.push({ id: textId, type: 'multiline-text', content: translated });
+          originalTexts.set(textEl, rawText.trim());
+          
+          // Make the text element draggable
+          makeDraggable(textEl);
+        }
+      }
+
+      // ADD ICON (text-based icon or uploaded images handled elsewhere)
+      if (selectedIcon) {
+        const size = document.getElementById('iconSize').value;
+        const xPx = document.getElementById('iconX').value;   // user input (px)
+        const yPx = document.getElementById('iconY').value;   // user input (px)
+
+        // ---- NEW: convert px → viewBox coordinates -----------------
+        const svgEl = document.querySelector('#svgPreview svg');
+        const viewBox = svgEl.getAttribute('viewBox').split(/\s+/).map(Number);
+        const vbWidth = viewBox[2];
+        const vbHeight = viewBox[3];
+
+        // Use the SVG's rendered size so border/padding on the parent
+        // container won't change the px->viewBox conversion.
+        const svgRect = svgEl.getBoundingClientRect();
+        const containerW = svgRect.width || svgEl.parentElement.clientWidth || vbWidth;
+        const containerH = svgRect.height || svgEl.parentElement.clientHeight || vbHeight;
+
+        const scaleX = vbWidth  / (containerW || vbWidth);
+        const scaleY = vbHeight / (containerH || vbHeight);
+
+        const x = +xPx * scaleX;   // viewBox units
+        const y = +yPx * scaleY;   // viewBox units
+        // -----------------------------------------------------------
+
+        const iconEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        iconEl.setAttribute('x', x);
+        iconEl.setAttribute('y', y);
+        iconEl.setAttribute('font-size', size);
+        iconEl.setAttribute('text-anchor', 'middle');
+        iconEl.setAttribute('dominant-baseline', 'central');
+        iconEl.textContent = selectedIcon;
+
+        const id = 'icon-' + Date.now();
+        iconEl.setAttribute('data-element-id', id);   // <-- needed for drag & erase
+
+        svgEl.appendChild(iconEl);
+        addedElements.push({ id, type: 'icon', content: selectedIcon });
+
+        // make it draggable immediately
+        makeDraggable(iconEl);
+    }
+
+      reapplyInteractivity();
+      updateElementList();
+      await applyTranslation();
+    }
+
+
+
+    function makeSelectable(el) {
+        el.addEventListener("mousedown", e => {
+            if (currentMode === "edit") {
+                selectElement(el);
+                e.stopPropagation();
+            }
+        });
+    }
+
+function selectElement(el) {
+    // remove old highlight
+    if (selectionBox) {
+        selectionBox.remove();
+        selectionBox = null;
+    }
+
+    // clear old selected class
+    if (selectedElement) {
+        selectedElement.classList.remove("selected-element");
+    }
+
+    selectedElement = el;
+    selectedElement.classList.add("selected-element");
+
+    // ---- CREATE SELECTION HIGHLIGHT RECT ----
+    const parent = el.parentNode; // <-- insert inside parent, not always svg
+    const bbox = el.getBBox();
+
+    const bgColor = document.getElementById('bgColorText').value;
+    const borderColor = document.getElementById('borderColorText').value;
+    const borderWidth = parseFloat(document.getElementById('borderWidth').value);
+    const borderRadius = parseFloat(document.getElementById('borderRadius').value);
+
+    selectionBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    selectionBox.setAttribute("x", bbox.x - borderWidth);
+    selectionBox.setAttribute("y", bbox.y - borderWidth);
+    selectionBox.setAttribute("width", bbox.width + borderWidth * 2);
+    selectionBox.setAttribute("height", bbox.height + borderWidth * 2);
+    selectionBox.setAttribute("fill", bgColor);
+    selectionBox.setAttribute("stroke", borderColor);
+    selectionBox.setAttribute("stroke-width", borderWidth);
+    // Keep selection helper rectangular so it doesn't inherit canvas rounding
+    selectionBox.setAttribute("rx", 0);
+    selectionBox.setAttribute("pointer-events", "none");
+
+
+
+    // insert directly before element to sit behind it
+    parent.insertBefore(selectionBox, el);
+}
+
+
+    // ---------- ERASE MODE ----------
+    function makeElementsErasable() {
+      const svg = document.querySelector('#svgPreview svg');
+      if (!svg) return;
+      svg.querySelectorAll('text, circle, rect, path, polygon, line, ellipse, polyline, image').forEach(el => {
+        if (!el.hasAttribute('data-background')) {
+          el.classList.add('erasable-element');
+          el.onclick = e => {
+            if (currentMode === 'erase') {
+              e.stopPropagation();
+              eraseElement(el);
+            }
+          };
+        }
+      });
+    }
+
+    function removeErasableClasses() {
+      document.querySelectorAll('.erasable-element').forEach(el => {
+        el.classList.remove('erasable-element');
+        el.onclick = null;
+      });
+    }
+
+    function eraseElement(el) {
+      if (confirm('Delete this element?')) {
+        const id = el.getAttribute('data-element-id');
+        if (id) {
+          addedElements = addedElements.filter(item => item.id !== id);
+        }
+        el.remove();
+        updateElementList();
+      }
+    }
+
+    // ---------- ELEMENT LIST ----------
+    function updateElementList() {
+      const container = document.getElementById('elementList');
+      if (addedElements.length === 0) {
+        container.innerHTML = '<p style="color: #999; text-align: center; font-size: 12px;">No elements added yet</p>';
+        return;
+      }
+      container.innerHTML = '';
+      addedElements.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'element-item';
+        const contentShort = (item.content || '').toString().substring(0,15);
+        div.innerHTML = `<span>${item.type}: ${contentShort}${(item.content||'').toString().length > 15 ? '...' : ''}</span>
+                         <button class="delete-btn" onclick="deleteAddedElement('${item.id}')">Delete</button>`;
+        container.appendChild(div);
+      });
+    }
+
+    window.deleteAddedElement = function (id) {
+      const el = document.querySelector(`[data-element-id="${id}"]`);
+      if (el) el.remove();
+      addedElements = addedElements.filter(item => item.id !== id);
+      updateElementList();
+    };
+
+    function clearAllElements() {
+      if (addedElements.length === 0) {
+        alert('No elements to clear!');
+        return;
+      }
+      if (confirm('Clear all added elements?')) {
+        addedElements.forEach(item => {
+          const el = document.querySelector(`[data-element-id="${item.id}"]`);
+          if (el) el.remove();
+        });
+        addedElements = [];
+        updateElementList();
+      }
+    }
+
+    // ---------- DRAG FUNCTIONALITY ----------
+    function makeDraggable(el) {
+      if (el.hasAttribute('data-background')) return;
+
+      el.style.cursor = 'move';
+      el.addEventListener('mousedown', function (e) {
+        if (currentMode !== 'edit') return;
+        e.preventDefault();
+        dragged = el;
+
+        const svg = el.ownerSVGElement;
+        const pt = svg.createSVGPoint();
+        const rect = el.getBBox();
+
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const cursorPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+        offset.x = cursorPt.x - rect.x - (rect.width / 2);
+        offset.y = cursorPt.y - rect.y - (rect.height / 2);
+      });
+    }
+
+    document.addEventListener('mousemove', function (e) {
+      if (!dragged) return;
+
+      const svg = dragged.ownerSVGElement;
+      const pt = svg.createSVGPoint();
+      pt.x = e.clientX;
+      pt.y = e.clientY;
+      const cursorPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+      const newX = cursorPt.x - offset.x;
+      const newY = cursorPt.y - offset.y;
+
+      if (dragged.tagName === 'text') {
+        // Check if it has tspans (multiline text) or is single line
+        const hasMultiline = dragged.querySelector('tspan');
+        
+        if (hasMultiline) {
+          // For multiline text, update x and y attributes
+          dragged.setAttribute('x', newX);
+          dragged.setAttribute('y', newY);
+          
+          // Update all tspans to have the same x coordinate
+          dragged.querySelectorAll('tspan').forEach(tspan => {
+            tspan.setAttribute('x', newX);
+          });
+        } else {
+          // For single line text, just update x and y
+          dragged.setAttribute('x', newX);
+          dragged.setAttribute('y', newY);
+        }
+      } else if (dragged.tagName === 'g') {
+        // For groups, update transform
+        dragged.setAttribute('transform', `translate(${newX}, ${newY})`);
+      } else if (dragged.tagName === 'image') {
+        // For images set x/y directly
+        dragged.setAttribute('x', newX);
+        dragged.setAttribute('y', newY);
+      }
+    });
+
+    document.addEventListener('mouseup', function () {
+      dragged = null;
+    });
+
+    function reapplyInteractivity() {
+      const svg = document.querySelector('#svgPreview svg');
+      if (!svg) return;
+
+      // --- REMOVE ALL ERASE HANDLERS IN EDIT MODE ---
+      if (currentMode === "edit") {
+          svg.querySelectorAll('.erasable-element').forEach(el => {
+              el.classList.remove("erasable-element");
+              el.onclick = null;
+          });
+      }
+
+      // --- MAKE ALL ELEMENTS SELECTABLE IN EDIT MODE ---
+      svg.querySelectorAll('text, circle, rect, path, polygon, line, ellipse, polyline, image')
+        .forEach(el => {
+            if (!el.hasAttribute('data-background')) {
+                makeSelectable(el);
+            }
+      });
+
+      // --- DRAGGABLE ONLY FOR OUR CUSTOM ADDED ELEMENTS ---
+      svg.querySelectorAll('[data-element-id]').forEach(el => {
+        makeDraggable(el);
+      });
+
+
+      if (currentMode === 'erase') {
+        makeElementsErasable();
+      }
+    }
+
+    function updateSVGViewBox() {
+        const svg = document.querySelector('#svgPreview svg');
+        if (!svg) return;
+
+        const newW = parseFloat(document.getElementById('widthInput').value);
+        const newH = parseFloat(document.getElementById('heightInput').value);
+
+        // Update BOTH viewBox and physical size
+        svg.setAttribute('viewBox', `0 0 ${newW} ${newH}`);
+        svg.setAttribute('width', String(newW));
+        svg.setAttribute('height', String(newH));
+        svg.style.width = `${newW}px`;
+        svg.style.height = `${newH}px`;
+    }
+
+
+    function resizeInternalShapes() {
+        const svg = document.querySelector('#svgPreview svg');
+        if (!svg) return;
+
+        const newW = parseFloat(document.getElementById('widthInput').value);
+        const newH = parseFloat(document.getElementById('heightInput').value);
+
+        // Change the main rect with fixed size (your example)
+        const rect = svg.querySelector('#Rectangle_1756 rect');
+        if (rect) {
+            rect.setAttribute('width', newW);
+            rect.setAttribute('height', newH);
+        }
+    }
+
+
+    // ---------- DOWNLOAD ----------
+    function downloadSVG() {
+      const svg = document.querySelector('#svgPreview svg');
+      const container = document.getElementById('svgPreview');
+      if (!svg || !container) return alert('No SVG to download!');
+
+      // Remove any transient selection highlight from the live preview before cloning
+      if (typeof selectionBox !== 'undefined' && selectionBox) {
+        selectionBox.remove();
+        selectionBox = null;
+      }
+
+      // Clean the inner SVG of editor-only classes/styles before exporting
+      const innerClone = svg.cloneNode(true);
+      innerClone.querySelectorAll('.erasable-element').forEach(el => {
+        el.classList.remove('erasable-element');
+        el.removeAttribute('onclick');
+        el.removeAttribute('class');
+      });
+      innerClone.classList.remove('erase-cursor');
+      innerClone.querySelectorAll('[data-element-id]').forEach(el => el.removeAttribute('style'));
+      innerClone.querySelectorAll('rect[pointer-events="none"]').forEach(r => r.remove());
+
+      // Compute export dimensions from the parent container so exported
+      // artwork matches the visible preview (container includes the border)
+      const inputInnerW = parseFloat(document.getElementById('widthInput').value) || parseFloat(svg.getAttribute('width')) || 500;
+      const inputInnerH = parseFloat(document.getElementById('heightInput').value) || parseFloat(svg.getAttribute('height')) || 500;
+      const borderW = parseFloat(document.getElementById('borderWidth').value) || 0;
+      const borderR = parseFloat(document.getElementById('borderRadius').value) || 0;
+      const borderColor = document.getElementById('borderColorText').value || '#000';
+      const bgColor = document.getElementById('bgColorText').value || '#fff';
+
+      // Outer export size includes the container border on both sides
+      const exportW = Math.round(inputInnerW + borderW * 2);
+      const exportH = Math.round(inputInnerH + borderW * 2);
+
+      // Build a new top-level SVG that represents the visible preview
+      const xmlns = 'http://www.w3.org/2000/svg';
+      const out = document.createElementNS(xmlns, 'svg');
+      out.setAttribute('xmlns', xmlns);
+      out.setAttribute('width', String(exportW));
+      out.setAttribute('height', String(exportH));
+      out.setAttribute('viewBox', `0 0 ${exportW} ${exportH}`);
+
+      // background for inner artwork (positioned inside the border)
+      const bgRect = document.createElementNS(xmlns, 'rect');
+      bgRect.setAttribute('x', String(borderW));
+      bgRect.setAttribute('y', String(borderW));
+      bgRect.setAttribute('width', String(inputInnerW));
+      bgRect.setAttribute('height', String(inputInnerH));
+      bgRect.setAttribute('fill', bgColor);
+      out.appendChild(bgRect);
+
+      // Insert the inner SVG content translated to account for the border
+      const g = document.createElementNS(xmlns, 'g');
+      // Move inner children into group (clone already created)
+      Array.from(innerClone.childNodes).forEach(node => {
+        // adoptNode not available; use importNode via XMLSerializer if needed
+        g.appendChild(node.cloneNode(true));
+      });
+      g.setAttribute('transform', `translate(${borderW}, ${borderW})`);
+      out.appendChild(g);
+
+      // Add a visible border as a rounded stroke rect to match the container
+      if (borderW > 0) {
+        const strokeRect = document.createElementNS(xmlns, 'rect');
+        strokeRect.setAttribute('x', String(borderW / 2));
+        strokeRect.setAttribute('y', String(borderW / 2));
+        strokeRect.setAttribute('width', String(exportW - borderW));
+        strokeRect.setAttribute('height', String(exportH - borderW));
+        strokeRect.setAttribute('fill', 'none');
+        strokeRect.setAttribute('stroke', borderColor);
+        strokeRect.setAttribute('stroke-width', String(borderW));
+        strokeRect.setAttribute('rx', String(borderR));
+        out.appendChild(strokeRect);
+      }
+
+      // Do not append both language pairs into the main export.
+      // We will export the visible preview as-is (current language) and,
+      // if an alternate preview exists, produce a separate SVG for it
+      // so the user gets two separate images (one per language).
+
+      // Serialize and download
+      const serializer = new XMLSerializer();
+      let source = serializer.serializeToString(out);
+      source = '<?xml version="1.0" standalone="no"?>\n' + source;
+
+      const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+
+      // If there is NO alternate preview, simply trigger download for the main SVG
+      const altContainer = document.getElementById('svgPreviewAlt');
+      if (!altContainer) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'edited-svg.svg';
+        a.click();
+        URL.revokeObjectURL(url);
+        return;
+      }
+
+      // If an alternate preview exists, prepare the alternate SVG content
+      try {
+        const altSvg = altContainer.querySelector('svg');
+        if (altSvg) {
+          const altClone = altSvg.cloneNode(true);
+          altClone.querySelectorAll('.erasable-element').forEach(el => el.classList.remove('erasable-element'));
+          const s2 = '<?xml version="1.0" standalone="no"?>\n' + new XMLSerializer().serializeToString(altClone);
+
+          // Prefer packaging both into a ZIP to avoid multiple browser download restrictions
+          if (window.JSZip) {
+            try {
+              const zip = new JSZip();
+              zip.file('edited-svg.svg', source);
+              zip.file('edited-svg-en.svg', s2);
+              zip.generateAsync({ type: 'blob' }).then(zipBlob => {
+                const zipUrl = URL.createObjectURL(zipBlob);
+                const za = document.createElement('a');
+                za.href = zipUrl;
+                za.download = 'edited-svgs.zip';
+                za.click();
+                URL.revokeObjectURL(zipUrl);
+              }).catch(err => {
+                console.error('ZIP generation failed', err);
+                // fallback to sequential downloads
+                const url1 = URL.createObjectURL(blob);
+                const a1 = document.createElement('a');
+                a1.href = url1; a1.download = 'edited-svg.svg'; a1.click(); URL.revokeObjectURL(url1);
+                const blob2 = new Blob([s2], { type: 'image/svg+xml;charset=utf-8' });
+                const url2 = URL.createObjectURL(blob2);
+                const a2 = document.createElement('a');
+                a2.href = url2; a2.download = 'edited-svg-en.svg'; setTimeout(() => { a2.click(); URL.revokeObjectURL(url2); }, 250);
+              });
+            } catch (zErr) {
+              console.error('ZIP packaging failed', zErr);
+              // fallback to sequential downloads
+              const url1 = URL.createObjectURL(blob);
+              const a1 = document.createElement('a');
+              a1.href = url1; a1.download = 'edited-svg.svg'; a1.click(); URL.revokeObjectURL(url1);
+              const blob2 = new Blob([s2], { type: 'image/svg+xml;charset=utf-8' });
+              const url2 = URL.createObjectURL(blob2);
+              const a2 = document.createElement('a');
+              a2.href = url2; a2.download = 'edited-svg-en.svg'; setTimeout(() => { a2.click(); URL.revokeObjectURL(url2); }, 250);
+            }
+          } else {
+            // No JSZip — do sequential downloads (main then alt)
+            const url1 = URL.createObjectURL(blob);
+            const a1 = document.createElement('a');
+            a1.href = url1; a1.download = 'edited-svg.svg'; a1.click(); URL.revokeObjectURL(url1);
+            const blob2 = new Blob([s2], { type: 'image/svg+xml;charset=utf-8' });
+            const url2 = URL.createObjectURL(blob2);
+            const a2 = document.createElement('a');
+            a2.href = url2; a2.download = 'edited-svg-en.svg'; setTimeout(() => { a2.click(); URL.revokeObjectURL(url2); }, 250);
+          }
+        }
+      } catch (e) { console.error('Alternate download failed', e); }
+    }
+
+    // ---------- INITIALISE ----------
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelector('.mode-btn:not(.erase-mode)').classList.add('active');
+      currentMode = 'edit';
+
+      // Live updates
+      ['widthInput', 'heightInput', 'borderWidth', 'borderRadius', 'borderColorText', 'bgColorText','iconSize'].forEach(id => {
+        const el = document.getElementById(id);
+         if (el) el.addEventListener('input', () => {
+            applyVisualStyles();
+            updateSVGViewBox(); 
+            resizeInternalShapes();
+            try { updateUploadedImagesSize(); } catch (err) {}
+        });
+      });
+
+      // Text-related live preview wiring
+      ['textContent','textX','textY','textSize','fontFamily','fontWeight','fontStyle','letterSpacing','lineHeight','textMode','textWrapWidth','textColorText','textColorPicker'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const ev = el.tagName.toLowerCase() === 'select' || el.type === 'file' ? 'change' : 'input';
+        el.addEventListener(ev, () => {
+          try { updatePreviewText(); } catch (e) {}
+        });
+      });
+
+      // initial preview run
+      try { updatePreviewText(); } catch (e) {}
+      // --- Button hover color controls ---
+      function hexToRgb(hex) {
+        if (!hex) return null;
+        const h = hex.replace('#','').trim();
+        if (h.length === 3) {
+          return h.split('').map(c => parseInt(c + c, 16));
+        }
+        if (h.length === 6 || h.length === 8) {
+          return [parseInt(h.substring(0,2),16), parseInt(h.substring(2,4),16), parseInt(h.substring(4,6),16)];
+        }
+        return null;
+      }
+
+      const picker = document.getElementById('btnHoverColorPicker');
+      const txt = document.getElementById('btnHoverColorText');
+
+      function applyBtnHoverColor(hex) {
+        const rgb = hexToRgb(hex);
+        if (!rgb) return;
+        document.documentElement.style.setProperty('--btn-hover-rgba', rgb.join(','));
+        // keep default alphas for hover/active already defined in :root
+        if (txt) txt.value = hex;
+      }
+
+      if (picker && txt) {
+        // initialize
+        applyBtnHoverColor(picker.value || txt.value);
+
+        picker.addEventListener('input', (e) => {
+          const v = e.target.value;
+          txt.value = v;
+          applyBtnHoverColor(v);
+        });
+
+        txt.addEventListener('input', (e) => {
+          const v = e.target.value.trim();
+          if (/^#?[0-9a-fA-F]{6}$/.test(v) || /^#?[0-9a-fA-F]{3}$/.test(v)) {
+            const hex = v.startsWith('#') ? v : '#' + v;
+            picker.value = hex;
+            applyBtnHoverColor(hex);
+          }
+        });
+      }
+        // Also apply inline hover behavior to Export button to avoid conflicts
+        const exportBtn = document.querySelector('.btn.btn-secondary');
+        if (exportBtn) {
+          let originalBg = getComputedStyle(exportBtn).backgroundColor;
+          function setExportHoverColor(hex) {
+            const rgb = hexToRgb(hex);
+            if (!rgb) return;
+            // make an rgba with 0.12 alpha for hover preview
+            exportBtn.__hoverColor = `rgba(${rgb.join(',')},0.18)`; // slightly stronger for visibility
+          }
+
+          // init
+          setExportHoverColor(picker.value || txt.value);
+
+          picker.addEventListener('input', (e) => setExportHoverColor(e.target.value));
+          txt.addEventListener('input', (e) => {
+            const v = e.target.value.trim();
+            if (/^#?[0-9a-fA-F]{6}$/.test(v) || /^#?[0-9a-fA-F]{3}$/.test(v)) {
+              const hex = v.startsWith('#') ? v : '#' + v;
+              setExportHoverColor(hex);
+            }
+          });
+
+          exportBtn.addEventListener('mouseenter', () => {
+            if (exportBtn.__hoverColor) exportBtn.style.background = exportBtn.__hoverColor;
+          });
+          exportBtn.addEventListener('mouseleave', () => {
+            exportBtn.style.background = originalBg;
+          });
+        }
+    });
+
+    // clicking outside clears selection
+    document.addEventListener("mousedown", e => {
+        if (!document.getElementById("svgPreview").contains(e.target)) {
+            if (selectedElement) {
+                selectedElement.classList.remove("selected-element");
+                selectedElement = null;
+            }
+            if (selectionBox) {
+                selectionBox.remove();
+                selectionBox = null;
+            }
+        }
+    });
+
+
+
+  </script>
+
+<script>
+/* Minimal fallback for the HTML tab "Edit Sample SVG" button.
+   Ensures html_loadDefaultSVG exists and populates #htmlPreview with a simple sample SVG.
+   Keeps compatibility with optional html_* helper functions if present. */
+function html_loadDefaultSVG() {
+  const sample = `
+<svg xmlns="http://www.w3.org/2000/svg" width="249" height="64" viewBox="0 0 249 64">
+  <rect width="249" height="64" fill="#ffffff" data-background="true"/>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#0f172a">Sample</text>
+</svg>`.trim();
+
+  const preview = document.getElementById('htmlPreview');
+  if (!preview) {
+    console.warn('html_loadDefaultSVG: #htmlPreview not found');
+    return;
+  }
+
+  // Parse and insert SVG
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(sample, 'image/svg+xml');
+    const svgEl = doc.documentElement;
+    preview.innerHTML = ''; // clear existing content
+    preview.appendChild(svgEl);
+
+    // expose on window for any html_* scripts that expect html_currentSVG
+    try { window.html_currentSVG = sample; } catch (e) {}
+
+    // If the prefixed helpers exist, call them to update preview/translation
+    if (typeof html_applyTranslation === 'function') {
+      try { html_applyTranslation(); } catch (e) { /* ignore */ }
+    }
+    if (typeof html_updatePreviewText === 'function') {
+      try { html_updatePreviewText(); } catch (e) { /* ignore */ }
+    }
+  } catch (err) {
+    console.error('html_loadDefaultSVG error:', err);
+    preview.innerHTML = sample; // fallback
+  }
+}
+</script>
