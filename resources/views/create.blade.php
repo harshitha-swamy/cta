@@ -13,6 +13,10 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="/js/SVG_Utility/svg.js" defer></script>
+    <script src="/js/HTML_Utility/html.js" defer></script>
+
+
      <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://d1jougtdqdwy1v.cloudfront.net/js/5.2.3/bootstrap.bundle.min.js"></script>
@@ -159,7 +163,7 @@
                                                         <div id="uploadedFile" class="uploaded-file"></div>
                                                     </div>
                                                       
-                                                    <!-- Reference CTA Preview -->
+                                                   
                                                     
                                                     <div class="editedSection">
                                                         <button class="mode-btn active" onclick="setMode('edit', this)"><i class="bi bi-pencil-fill"></i> Edit Mode</button>
@@ -308,7 +312,7 @@
                                                             <div class="btn-section">
                                                                 <button class="applyCta" onclick="applyChanges()">Apply Changes</button>
                                                                 <button class="btn btn-danger" onclick="clearAllElements()">Clear All Elements</button>
-                                                                <button class="reviewCta" onclick="downloadSVG()">Download SVG</button>
+                                                                <button class="download_cta" onclick="downloadSVG()">Download SVG</button>
                                                             </div>
                                                     </div>
                                                 </div>
