@@ -1629,6 +1629,9 @@ $.ajaxSetup({
       const svg = document.querySelector('#svgPreview svg');
       if (!svg) return;
 
+      // CRITICAL: Remove any live preview text before applying permanent changes
+      svg.querySelectorAll('[data-preview="true"]').forEach(el => el.remove());
+      
       applyVisualStyles();
 
       const lang = document.getElementById('languageSelect').value;
